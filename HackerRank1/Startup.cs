@@ -26,8 +26,14 @@ namespace LibraryService.WebAPI
             // Add support for Dependency Injection for internal services (BooksService and LibrariesService)
             services.AddTransient<ILibrariesService,  LibrariesService>();
             services.AddTransient<IBooksService,  BooksService>();
+            services.AddTransient<IFraudService, FraudService>();
 
             services.AddDbContext<LibraryContext>(options => options.UseInMemoryDatabase("librarydb"));
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
             services.AddControllers();
 
             // Add Swagger generation
@@ -61,6 +67,7 @@ namespace LibraryService.WebAPI
             }
 
             app.UseRouting();
+            app.UseCors("AllowAll");
 
             app.UseEndpoints(endpoints =>
             {

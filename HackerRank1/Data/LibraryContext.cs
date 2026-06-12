@@ -1,5 +1,4 @@
-﻿using HackerRank1.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace LibraryService.WebAPI.Data
