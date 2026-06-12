@@ -2,7 +2,6 @@
 using LibraryService.WebAPI.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,23 +19,23 @@ namespace LibraryService.WebAPI
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add support for Dependency Injection for internal services (BooksService and LibrariesService)
-            services.AddTransient<ILibrariesService,  LibrariesService>();
-            services.AddTransient<IBooksService,  BooksService>();
+            services.AddTransient<ILibrariesService, LibrariesService>();
+            services.AddTransient<IBooksService, BooksService>();
             services.AddTransient<IFraudService, FraudService>();
 
-            services.AddDbContext<LibraryContext>(options => options.UseInMemoryDatabase("librarydb"));
+            services.AddDbContext<LibraryContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", builder =>
                     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             });
+
             services.AddControllers();
 
-            // Add Swagger generation
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -48,18 +47,12 @@ namespace LibraryService.WebAPI
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-
-
-                // Enable middleware to serve generated Swagger as a JSON endpoint.
                 app.UseSwagger();
-
-                // Enable middleware to serve swagger-ui, specifying the Swagger JSON endpoint.
                 app.UseSwaggerUI(c =>
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "LibraryService API v1");
